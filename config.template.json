@@ -1,0 +1,37 @@
+{
+    "bot": {
+        "account": {
+            "host": "mirai-api-http 地址",
+            "authKey": "mirai-api-http key",
+            "qq": 123456789,
+            "enableWebsocket": true
+        },
+        "manage": {
+            "listen": "all | group | friend (建议friend 不然太容易封)",
+            "contact": {
+                "qq": 987654321,
+                "name": "这里是你的联系方式，用于找不到资源/错误处理"
+            }
+        }
+    },
+    "azureApp": {
+        "clientId": "xxxxxxxx-mmmm-nnnn-oooo-zzzzzzzzzzzz",
+        "clientSecret": "就 secret",
+        "authority": "https://login.microsoftonline.com/common/",
+        "scopes": [
+            "User.Read",
+            "Files.ReadWrite.All"
+        ],
+        "root": "这里是express监听路径，例：'/microsoft'"
+    },
+    "express": {
+        "url": "http://这里是访问地址(一定要带端口)，用于计算重定向链接",
+        "port": 20461
+    },
+    "mongo": {
+        "host": "MongoDB连接地址(带端口)",
+        "user": "user",
+        "pwd": "pwd",
+        "db": "db"
+    }
+}

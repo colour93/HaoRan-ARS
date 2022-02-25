@@ -1,0 +1,82 @@
+//- index.pug
+//- 索引
+
+extends layout.pug
+
+//- header
+block script
+
+    script(src="/js/index.js") 
+
+//- 页面内容
+block content 
+
+    //- 判断是否登录
+    if !data.data
+        .card
+            .card-header 提示
+            .card-body 
+                h5.card-title 请登录您的 Microsoft 账户
+                a.btn.btn-primary(href=root+"/auth") 登录 Microsoft 账户
+
+    //- 判断是否绑定目录
+    if data.data && !data.bindPathId && driveList
+        .card 
+            .card-header 提示
+            .card-body
+                h5.card-title 请绑定资源目录
+                #userId.d-none= data.userId
+                .d-flex 
+                    select.form-select#bindPathSelect
+                        each driveItem in driveList
+                            option(value=driveItem.id)= driveItem.name
+                    button.btn.btn-primary(onclick="bindPath()") 绑定
+
+    br
+
+    //- 资源列表
+    if resources
+        .resourcesList
+            h4 已注册资源
+            button.btn.btn-primary(onclick="registerItem()") 注册新资源
+            table.table.table-striped
+                thead 
+                    tr 
+                        th(scope="col") #
+                        th(scope="col") 名称
+                        th(scope="col") 浏览量
+                        th(scope="col") 操作
+                tbody 
+                    each resourceItem in resources 
+                        tr 
+                            th(scope="row")= resourceItem.id
+                            th= resourceItem.name
+                            th= resourceItem.views
+                            th placeholder
+
+    br
+
+    //- 未注册资源列表
+    if dirsList
+        .dirList
+            h4 未注册资源
+            table.table.table-striped
+                thead 
+                    tr 
+                        th(scope="col") 文件名
+                        th(scope="col") 大小
+                        th(scope="col") 操作
+                tbody 
+                    each dirItem in dirList 
+                        tr 
+                            th(scope="row")= dirItem.name
+                            th= dirItem.sizeStr
+                            th placeholder
+
+
+
+    .position-fixed.bottom-0.end-0.p-3(style="z-index: 11")
+        #msgToast.toast(role="alert" aria-live="assertive" aria-atomic="true")
+            .toast-header 
+                strong.me-auto#msgToast-header 
+            .toast-body#msgToast-body 
