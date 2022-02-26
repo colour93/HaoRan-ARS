@@ -68,12 +68,17 @@ router.get('/', async (req, res) => {
             // 算是去重
             for (let i = 0; i < dirsList.length; i++) {
                 let item = dirsList[i];
+                let count = 0;
                 for (let j = 0; j < resources.length; j++) {
                     const resource = resources[j];
-                    if (item.id != resource.itemId) {
-                        item.sizeStr = $.sizeCalc(item.size);
-                        dirList.push(item);
+                    if (item.id == resource.itemId) {
+                        count ++;
+                        break;
                     };
+                }
+                if (!count) {
+                    item.sizeStr = $.sizeCalc(item.size);
+                    dirList.push(item);
                 }
             };
         } catch (error) {
@@ -135,8 +140,9 @@ router.get('/callback', async (req, res) => {
         const response = await msalClient.acquireTokenByCode(tokenRequest);
 
         const userId = response.account.homeAccountId;
-
+        
         // 保存 userId
+        req.session.userId = userId;
         result = await Account.updateOne({
             bot: config.bot.account.qq
         }, {
@@ -207,6 +213,8 @@ router.get('/signout', async (req, res) => {
                 }
             });
         }
+
+        req.session.destroy();
 
         clog.log(`${userAccount.name} (${userAccount.username}) 已登出`);
     }

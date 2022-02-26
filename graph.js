@@ -90,15 +90,19 @@ async function getAuthenticatedClient() {
     }
     const {userId} = result;
 
+    // 获取用户账户
+    const account = await msalClient
+        .getTokenCache()
+        .getAccountByHomeId(userId);
+    if (!account) {
+        throw new Error(`未登录`);
+    }
+
     // 初始化 Graph 客户端
     const client = graph.Client.init({
         // 通过应用的 MSAL实例 实现一个获取令牌的身份验证提供程序
         authProvider: async (done) => {
             try {
-                // 获取用户账户
-                const account = await msalClient
-                    .getTokenCache()
-                    .getAccountByHomeId(userId);
 
                 if (account) {
                     // 尝试静默获取 token

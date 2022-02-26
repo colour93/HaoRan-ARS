@@ -67,16 +67,43 @@ block content
                         th(scope="col") 大小
                         th(scope="col") 操作
                 tbody 
+                    - var n = 1
                     each dirItem in dirList 
-                        tr 
-                            th(scope="row")= dirItem.name
+                        tr(id=n)
+                            th(scope="row")#itemName= dirItem.name
                             th= dirItem.sizeStr
-                            th placeholder
+                            th
+                                button.btn.btn-primary(onclick="registerItemHandle("+n+")") 注册
+                            th.d-none#itemId= dirItem.id
 
 
-
+    //- toast
     .position-fixed.bottom-0.end-0.p-3(style="z-index: 11")
         #msgToast.toast(role="alert" aria-live="assertive" aria-atomic="true")
             .toast-header 
                 strong.me-auto#msgToast-header 
             .toast-body#msgToast-body 
+
+    //- 注册新资源的modal
+    #registerItemModal.modal.fade
+        .modal-dialog
+            .modal-content
+                .modal-header 
+                    h5.modal-title#registerItemModalLabel 标题
+                    button.btn-close(type="button" data-bs-dismiss="modal" aria-label="Close")
+                .modal-body 
+                    .mb-3.row 
+                        label.col-sm-2.col-form-label(for="modalName") 名称
+                        .col-sm-10
+                            input.form-control#modalName(type="text" value="")
+                    .mb-3.row 
+                        label.col-sm-2.col-form-label(for="modalFileName") 文件名
+                        .col-sm-10
+                            input.form-control-plaintext#modalFileName(type="text" readonly value="value")
+                    .mb-3.row 
+                        label.col-sm-2.col-form-label(for="modalItemId") 文件ID
+                        .col-sm-10
+                            input.form-control-plaintext#modalItemId(type="text" readonly value="value")
+                .modal-footer 
+                    button.btn.btn-secondary(type="button" data-bs-dismiss="modal") 取消
+                    button.btn.btn-primary(type="button" onclick="registerItem()") 确定

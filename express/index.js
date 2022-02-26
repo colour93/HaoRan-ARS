@@ -10,6 +10,7 @@ const logger = require('morgan');
 const clog = require('yooofur-clog');
 const path = require('path');
 const bodyParser = require('body-parser');
+const session = require('express-session');
 
 clog.info("初始化 Express");
 
@@ -33,10 +34,18 @@ app.use(bodyParser.json())
 // 初始化参数
 const
     { root } = config.azureApp,
-    { port, url } = config.express,
+    { port, url, secret } = config.express,
     redirectUri = config.express.url + root + "/callback";
 
 app.locals.users = {};
+
+// 初始化 session
+app.use(session({
+    secret,
+    resave: false,
+    saveUninitialized: false,
+    unset: 'destroy'
+}));
 
 // 初始化模板引擎
 app.set('views', path.join(__dirname, 'views'));
@@ -54,8 +63,7 @@ clog.info(``);
 clog.info(`==========================`);
 
 // 设置中间件
-// app.use(root, middle.rootVerify);
-// app.use('/api', middle.verifyAccess);
+app.use('/api', middle.verifyAccess);
 
 // 设置路由
 app.use(root, rootRouter);

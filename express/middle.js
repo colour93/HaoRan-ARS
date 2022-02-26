@@ -23,36 +23,31 @@ const {root} = config.azureApp;
  * 校验 session 是否存在
  */
 async function verifyAccess (req, res, next) {
+
+    const {userId} = req.session;
+    if (!userId) {
+        res.send({
+            code: 401,
+            msg: "未登录"
+        });
+        return;
+    }
     
     const accounts = await msalClient
         .getTokenCache()
         .getAllAccounts();
-    if (!accounts.length) {
-        await Account.deleteOne({ bot: config.bot.account.qq });
-        res.redirect(root);
+    const userAccount = accounts.find(a => a.homeAccountId === userId);
+    if (!userAccount) {
+        res.send({
+            code: 401,
+            msg: "未能找到登录信息"
+        })
         return;
     }
 
     next();
 }
 
-/**
- * 校验 token缓存 是否存在
- */
-async function rootVerify (req, res, next) {
-    
-    const accounts = await msalClient
-        .getTokenCache()
-        .getAllAccounts();
-    if (!accounts.length) {
-        await Account.deleteOne({ bot: config.bot.account.qq });
-    }
-
-    next();
-}
-
-
 module.exports = {
-    verifyAccess,
-    rootVerify
+    verifyAccess
 }

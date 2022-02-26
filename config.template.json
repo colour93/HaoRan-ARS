@@ -25,6 +25,7 @@
         "root": "这里是express监听路径，例：'/microsoft'"
     },
     "express": {
+        "secret": "session加密密钥",
         "url": "http://这里是访问地址(一定要带端口)，用于计算重定向链接",
         "port": 20461
     },

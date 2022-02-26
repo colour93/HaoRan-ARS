@@ -17,36 +17,39 @@ const $ = require('./base');
 /**
  * 更新文件下载链接
  */
-async function updateFileUrl (itemId) {
+async function updateFileUrl(itemId) {
 
-    clog.log(`开始更新文件下载链接，itemId: ${itemId}`)
+        clog.log(`开始更新文件下载链接，itemId: ${itemId}`)
 
-    // 获取文件详情
-    detail = await graph.getItemDetail(itemId);
-
-    const expire = (new Date()).getTime() + 1800000;
-
-    const
-        {name, size} = detail,
-        url = detail['@microsoft.graph.downloadUrl'];
-
-    clog.log(`${name} (itemId: ${itemId})下载链接已更新！`)
-
-    const downloadUrl = {url, expire};
-
-    // 更新文件详情
-    result = await Resource.updateOne({itemId}, {
-        $set: {
-            fileName: name,
-            size: {
-                num: size,
-                str: $.sizeCalc(size)
-            },
-            downloadUrl
+        // 获取文件详情
+        try {
+            detail = await graph.getItemDetail(itemId);
+        } catch (error) {
+            throw new Error(error);
         }
-    })
 
-    return new Promise ((resolve, reject) => {
+        const expire = (new Date()).getTime() + 1800000;
+
+        const
+            { name, size } = detail,
+            url = detail['@microsoft.graph.downloadUrl'];
+
+        clog.log(`${name} (itemId: ${itemId})下载链接已更新！`)
+
+        const downloadUrl = { url, expire };
+
+        // 更新文件详情
+        result = await Resource.updateOne({ itemId }, {
+            $set: {
+                fileName: name,
+                size: {
+                    num: size,
+                    str: $.sizeCalc(size)
+                },
+                downloadUrl
+            }
+        })
+    return new Promise((resolve, reject) => {
         resolve(downloadUrl);
         return;
     })

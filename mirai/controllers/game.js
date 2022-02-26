@@ -75,7 +75,20 @@ async function downloadGame (message, msgAry) {
     clog.log(`${message.sender.nickname} (${message.sender.id}) 访问了: ${name}`);
 
     if (!downloadUrl || (ts > downloadUrl.expire)) {
-        downloadUrl = await fileInfo.updateFileUrl(itemId);
+        try {
+            downloadUrl = await fileInfo.updateFileUrl(itemId);
+        } catch (error) {
+            let replyMsg = ""
+            if (error == "Error: Error: 未登录") {
+                replyMsg = `远程存储账户未登录\n`;
+            } else {
+                replyMsg = `遇到未知错误\n`;
+                replyMsg += `${error}\n`;
+            }
+            replyMsg += `请联系管理员👉${contact.name} ${contact.qq}`
+            message.reply(replyMsg);
+            return;
+        }
     };
 
     if (!downloadUrl) {

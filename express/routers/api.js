@@ -7,6 +7,10 @@
 const express = require('express');
 const graph = require('../../graph');
 
+// 引入控制器
+const $ = require('../../controllers/base');
+const fileInfo = require('../../controllers/fileInfo');
+
 // 引入 MSAL 实例
 const msalClient = require('../../msal');
 
@@ -16,6 +20,7 @@ const clog = require('yooofur-clog');
 
 // 引用数据模型
 const Account = require('../../mongo/schemas/Account');
+const Resource = require('../../mongo/schemas/Resource');
 
 // 初始化路由
 let router = express.Router();
@@ -33,7 +38,8 @@ router.post('/bindPath', async (req, res) => {
 
     clog.log("发起绑定目录请求");
 
-    const {userId, bindPathId} = req.body;
+    const {bindPathId} = req.body;
+    const {userId} = req.session;
 
     result = await Account.updateOne({userId}, {
         $set: {bindPathId}
@@ -53,6 +59,35 @@ router.post('/bindPath', async (req, res) => {
         code: 0,
         msg: 'success'
     })
+})
+
+/**
+ * 注册新资源
+ * POST /registerItem
+ */
+router.post('/registerItem', async (req, res) => {
+
+    clog.log("发起注册资源请求");
+
+    const {itemId, name} = req.body;
+
+    // 直接写数据库
+    id = (await Resource.findOne({}, null, {sort: {_id: -1}})).id + 1;
+    result = await Resource.updateOne({itemId}, {
+        name, id, itemId,
+        views: 0
+    }, {upsert: true})
+
+    // 然后就是刷新文件相关信息
+    result = await fileInfo.updateFileUrl(itemId);
+    
+    clog.log(`已注册新资源: ${name} (${itemId})`)
+
+    res.send({
+        code: 0,
+        msg: 'success'
+    });
+
 })
 
 module.exports = router;
